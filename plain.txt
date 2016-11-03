@@ -1,4 +1,1 @@
-hello there my name is josh winter and this is going to be some cipher text my vigenere
-solver. i need a lot of text in here, as the solver works best with lots of text
-here is some more text. and here is some text over here. I am going to encrypt this with
-the keyword violet. and then i am going to try solving it with the vigenere solver
+HELLOMYNAMEISJOSHWINTERANDTHISISSOMECIPHERTEXTFORMYVIGENERECIPHEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEETHERENEEDSTOBELOTSOFEEEEEEEEEEEEEEEEESFORTHISTOWORKEEEEEIHOPEITWORKSBYE
