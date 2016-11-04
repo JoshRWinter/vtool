@@ -18,42 +18,72 @@ public class Vigenere{
 		return this.period;
 	}
 
+	public String getKey(){
+		return this.key.toString();
+	}
+
 	public String decrypt(){
 		this.strip();
 		this.key.setLength(0); // clear any previous attempts at the key
 
 		for(int i = 0; i < this.period; ++i){
-			System.out.println("\033[33mMost common is " + this.alphabetShift(i) + "\033[0m");
-			this.key.append((char)(this.alphabetShift(i) + 'A'));
+			this.key.append((char)(this.alphabetShift(i,'e') + 'A'));
 		}
-		System.out.println("\033[32mThe key is: \"" + key.toString() + "\"\033[0m");
-		return "no idea browski";
+		return Vigenere.vigenere(this.ctext.toString(),this.key.toString());
+	}
+
+	private static String vigenere(String ctext,String key){
+		StringBuilder ptext = new StringBuilder();
+		for(int i = 0; i < ctext.length(); ++i){
+			char c = (char)(ctext.charAt(i) - 'A');
+			char k = (char)(key.charAt(i % key.length()) - 'A');
+
+			if(c < k)
+				c = (char)(c + 26);
+			c = (char)(c - k);
+
+			ptext.append((char)(c + 'a'));
+		}
+		return ptext.toString();
 	}
 
 	// this function, given the index into this.alphabet, will
 	// guess the shift that, once applied, yields plaintext
 	// for that alphabet. if it doesn't think that it is a valid
 	// alphabet, (based on letter frequencies) returns -1.
-	private int alphabetShift(int index){
-		int[] lf = new int[26];
-		for(int i = 0; i < 26; ++i)lf[i] = 0;
+	// target is the most common char to check for (eg. e, t, a)
+	private int alphabetShift(int index, char target){
+		int mostCommon = findMostCommon(this.alphabet[index].toString()) - 'A';
 
-		for(int i = 0; i < this.alphabet[index].length(); ++i){
-			lf[this.alphabet[index].charAt(i) - 'A']++;
-		}
-
-		int common = 0;
-		for(int i = 1; i < 26; ++i){
-			if(lf[i] > lf[common])
-				common = i;
-		}
-
-		if(common >= 4)
-			return common - 4; // 4 is 'E'
+		if(mostCommon >= 4)
+			return mostCommon - 4; // 4 is 'E'
 		else
-			return (common - 4) + 26;
+			return (mostCommon - 4) + 26;
 	}
 
+	// return true if the most common letter in a string is plausible for english
+	private static boolean plausible(String s){
+		char mostCommon = Vigenere.findMostCommon(s);
+		return mostCommon == 'E' || mostCommon == 'T' || mostCommon == 'A' || mostCommon == 'O';
+	}
+
+	// search for and return the most common character in a String
+	private static char findMostCommon(String s){
+		int[] lf = new int[26];
+		for(int i = 0; i < 26; ++i) lf[i] = 0;
+
+		for(int i = 0; i < s.length(); ++i){
+			lf[s.charAt(i) - 'A']++;
+		}
+
+		int mostCommon = 0;
+		for(int i = 1; i < 26; ++i){
+			if(lf[i] > lf[mostCommon])
+				mostCommon = i;
+		}
+
+		return (char)(mostCommon + 'A');
+	}
 
 	private void strip(){
 		this.alphabet = new StringBuilder[this.period];
