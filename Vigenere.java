@@ -3,9 +3,12 @@ public class Vigenere{
 	private StringBuilder[] alphabet; // the stripped alphabets
 	private StringBuilder key;
 	private int period;
+	private final char[] target = {'e','t','a','o','i'};
+	private int targetIndex;
 
 	public Vigenere(String text){
 		this.period = 6;
+		this.targetIndex = 0;
 		this.key = new StringBuilder();
 		this.ctext = new StringBuilder(text.length());
 		for(int i = 0; i < text.length(); ++i){
@@ -22,12 +25,14 @@ public class Vigenere{
 		return this.key.toString();
 	}
 
+	// this is where the magic happens
 	public String decrypt(){
 		this.strip();
 		this.key.setLength(0); // clear any previous attempts at the key
 
 		for(int i = 0; i < this.period; ++i){
-			this.key.append((char)(this.alphabetShift(i,'e') + 'A'));
+			int shift = this.alphabetShift(i,this.target[this.targetIndex]);
+			this.key.append((char)((shift) + 'A'));
 		}
 		return Vigenere.vigenere(this.ctext.toString(),this.key.toString());
 	}
@@ -50,15 +55,16 @@ public class Vigenere{
 	// this function, given the index into this.alphabet, will
 	// guess the shift that, once applied, yields plaintext
 	// for that alphabet. if it doesn't think that it is a valid
-	// alphabet, (based on letter frequencies) returns -1.
+	// alphabet
 	// target is the most common char to check for (eg. e, t, a)
 	private int alphabetShift(int index, char target){
+		target = (char)(Character.toUpperCase(target) - 'A');
 		int mostCommon = findMostCommon(this.alphabet[index].toString()) - 'A';
 
-		if(mostCommon >= 4)
-			return mostCommon - 4; // 4 is 'E'
+		if(mostCommon >= target)
+			return mostCommon - target;
 		else
-			return (mostCommon - 4) + 26;
+			return (mostCommon - target) + 26;
 	}
 
 	// return true if the most common letter in a string is plausible for english
