@@ -7,10 +7,13 @@ public class Vigenere{
 	private int targetIndex;
 
 	public Vigenere(String text){
-		this.period = 6;
+		this.period = 1;
 		this.targetIndex = 0;
 		this.key = new StringBuilder();
 		this.ctext = new StringBuilder(text.length());
+		this.wf = new WordFinder();
+
+		// set cipher text to all caps with no puct or spaces, just letters
 		for(int i = 0; i < text.length(); ++i){
 			if(this.isValidChar(text.charAt(i)))
 				this.ctext.append(Character.toUpperCase(text.charAt(i)));
@@ -25,16 +28,16 @@ public class Vigenere{
 		return this.key.toString();
 	}
 
+	// this function is designed to be called multiple times in a row, picking up
+	// where it left off. that's why it must rely on class scope variables, so
+	// it can retain it's state across invocations.
+	// ---------
 	// this is where the magic happens
+	// ---------
+	// set the key and return the suspected plain text. if the user notices the plain
+	// text is wrong, it can be called again to try again
 	public String decrypt(){
-		this.strip();
-		this.key.setLength(0); // clear any previous attempts at the key
 
-		for(int i = 0; i < this.period; ++i){
-			int shift = this.alphabetShift(i,this.target[this.targetIndex]);
-			this.key.append((char)((shift) + 'A'));
-		}
-		return Vigenere.vigenere(this.ctext.toString(),this.key.toString());
 	}
 
 	private static String vigenere(String ctext,String key){
