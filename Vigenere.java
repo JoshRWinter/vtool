@@ -5,6 +5,7 @@ public class Vigenere{
 	private int period;
 	private final char[] target = {'e','t','a','o','i'};
 	private int targetIndex;
+	private WordFinder wf;
 
 	public Vigenere(String text){
 		this.period = 1;
@@ -37,6 +38,7 @@ public class Vigenere{
 	// set the key and return the suspected plain text. if the user notices the plain
 	// text is wrong, it can be called again to try again
 	public String decrypt(){
+		return "lol nothing works";
 
 	}
 
