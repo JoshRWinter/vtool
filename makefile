@@ -1,4 +1,4 @@
-Main.class: Main.java Vigenere.class WordFinder.class DictionarySearchWorker.class
+Main.class: Main.java Vigenere.class WordFinder.class WordFinderWorker.class
 	javac Main.java
 	java Main
 
@@ -8,8 +8,8 @@ Vigenere.class: Vigenere.java
 WordFinder.class: WordFinder.java
 	javac WordFinder.java
 
-DictionarySearchWorker.class: DictionarySearchWorker.java
-	javac DictionarySearchWorker.java
+WordFinderWorker.class: WordFinderWorker.java
+	javac WordFinderWorker.java
 
 clean:
 	rm *.class

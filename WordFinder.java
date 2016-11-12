@@ -3,14 +3,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-public class WordFinder{
+import java.lang.Thread;
 
-	private String[] word;
+public class WordFinder extends Thread{
+
+	public static String[] word;
 	public static final int WORD_COUNT = 10;
 	public static final int MIN_LETTERS = 6;
 	public boolean valid;
 
-	private static final int DICTIONARY_LENGTH = 61500;
+	private static final int DICTIONARY_LENGTH = 61504;
+	private static final int WORKER_COUNT = 8; // reasonable assumption for # of logical processors
+	private static final int WORKLOAD = WordFinder.DICTIONARY_LENGTH / WordFinder.WORKER_COUNT;
+
+	public static String[] foundWords;
+	public static int foundWordsIndex;
 
 	public WordFinder(){
 		// load the file
@@ -25,7 +32,9 @@ public class WordFinder{
 		this.valid = true;
 
 		// allocate the arrays
-		this.word = new String[DICTIONARY_LENGTH]; // file "american_english" contains around 86,000 words
+		WordFinder.word = new String[DICTIONARY_LENGTH]; // file "american_english" contains around 86,000 words
+		WordFinder.foundWords = new String[WordFinder.WORD_COUNT];
+		WordFinder.foundWordsIndex = 0;
 
 		// fill the this.word list
 		int index = 0;
@@ -38,61 +47,53 @@ public class WordFinder{
 
 		// fill the rest of 'em up with empties
 		for(int i = index; i < DICTIONARY_LENGTH; ++i){
-			this.word[i] = "";
+			this.word[i] = new String("");
 		}
 
 		wordsFile.close();
-		for(int i = 0; i < 20; ++i)
-			System.out.println(this.word[i]);
+		/*for(int i = 0; i < 20; ++i)
+			System.out.println(this.word[i]);*/
 	}
 
 	// pass a string, returns true if WORD_COUNT unique words of at least MIN_LETTERS are found.
 	// reliable enough for checking if something decrypted properly
+	// search from this.word[lower] to this.word[upper]
 	public boolean isEnglish(String text){
-		String[] foundWords = new String[WordFinder.WORD_COUNT];
-
-		for(int i = 0; i < WordFinder.WORD_COUNT; ++i)
-			foundWords[i] = "";
-
 		if(!this.valid)
 			return false;
 
-		// loop through all the words in the words list
-		int foundWordsIndex = 0;
-		for(int i = 0; i < this.word.length; ++i){
-			// don't find words that have already been founj
-			boolean conflict = false;
-			for(int j = 0; j < WordFinder.WORD_COUNT; ++j){
-				if(this.word[i].equals(foundWords[j])){
-					conflict = true;
-					break;
-				}
-			}
-			if(conflict)
-				continue;
+		for(int i = 0; i < WordFinder.WORD_COUNT; ++i)
+			this.foundWords[i] = new String("");
 
-			// look for any occurrence of <this.word[i]> in <text>
-			if(text.contains(this.word[i])){
-				foundWords[foundWordsIndex++] = this.word[i];
+		WordFinderWorker[] worker = new WordFinderWorker[WordFinder.WORKER_COUNT];
 
-				if(foundWordsIndex == WORD_COUNT){
-					// print the found words list
-					for(int x = 0; x < foundWords.length; ++x){
-						System.out.println("\033[32mthis.foundWords[" + x + "] == \"" + foundWords[x] + "\";\033[0m");
-					}
-
-					return true;
-				}
-			}
-			/*System.out.print("\r\033[32;1m[" + (int)(((float)i/this.word.length)*100) + "% done] (found " + foundWordsIndex + " so far)\033[0m");*/
+		// spawn the workers
+		for(int i = 0; i < WordFinder.WORKER_COUNT; ++i){
+			worker[i] = new WordFinderWorker(text, i * WordFinder.WORKLOAD, (i * WordFinder.WORKLOAD) + WORKLOAD, i);
+			worker[i].start();
 		}
 
-		//System.out.println("foundWordsIndex == " + foundWordsIndex);
-		// print the found words list
-		/*for(int i = 0; i < foundWords.length; ++i){
-			System.out.println("\033[31mthis.foundWords[" + i + "] == \"" + foundWords[i] + "\";\033[0m");
-		}*/
-		return false;
+		// wait for workers to finish
+		for(int i = 0; i < WordFinder.WORKER_COUNT; ++i){
+			try{
+				worker[i].join();
+			}catch(Exception e){
+			}
+		}
+
+		boolean success = WordFinder.foundWordsIndex == WordFinder.WORD_COUNT;
+
+		// print found words
+		if(success)
+			System.out.print("\033[32;1m");
+		else
+			System.out.print("\033[31;1m");
+
+		for(int i = 0; i < WordFinder.foundWords.length; ++i){
+			System.out.println("WordFinder.foundWords[" + i + "] == \"" + WordFinder.foundWords[i] + "\";");
+		}
+		System.out.println("\033[0m");
+		return success;
 	}
 }
 

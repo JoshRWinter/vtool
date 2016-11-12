@@ -49,7 +49,7 @@ public class Vigenere{
 			this.key.append((char)(shift + 'A'));
 		}
 		String decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
-		final int TRIES = 4000;
+		final int TRIES = 1; //729;
 		for(int i = 0; i < TRIES; ++i){
 		/*	boolean success = */this.wf.isEnglish(decrypted);
 			System.out.print("\r[" + (int)(((float)i/TRIES)*100) + "% done]");
