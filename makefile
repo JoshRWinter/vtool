@@ -1,4 +1,4 @@
-Main.class: Main.java Vigenere.class WordFinder.class WordFinderWorker.class
+Main.class: Main.java Vigenere.class WordFinder.class WordFinderWorker.class Permuter.class
 	javac Main.java
 	java Main
 
@@ -10,6 +10,9 @@ WordFinder.class: WordFinder.java
 
 WordFinderWorker.class: WordFinderWorker.java
 	javac WordFinderWorker.java
+
+Permuter.class: Permuter.java
+	javac Permuter.java
 
 clean:
 	rm *.class
