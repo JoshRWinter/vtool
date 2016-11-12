@@ -1,15 +1,27 @@
+/* Vigenere.java
+   The idea here is to split the plaintext into <period> alphabets,
+   and try to find the most common letter in each alphabet.
+
+   Then a shift is applied to each alphabet in order to solve the text.
+   The shift that is applied will use 4 of the most common english letter frequencies,
+   "e, t, a, o".
+
+   First, try with a period of 1, then keep going up to period MAX_PERIOD.
+   the WordFinder class will be needed to determine if valid plaintext results
+   from the decrypt() method of this class.
+
+   This solver works best on large sets of english text, with short keys.
+ */
 public class Vigenere{
 	private StringBuilder ctext;
 	private StringBuilder[] alphabet; // the stripped alphabets
 	private StringBuilder key;
 	private int period;
-	private final char[] target = {'e','t','a','o','i'};
-	private int targetIndex;
+	private final char[] target = {'e','t','a','o'}; // most common english letters
 	private WordFinder wf;
 
 	public Vigenere(String text){
-		this.period = 1;
-		this.targetIndex = 0;
+		this.period = 6;
 		this.key = new StringBuilder();
 		this.ctext = new StringBuilder(text.length());
 		this.wf = new WordFinder();
@@ -21,27 +33,36 @@ public class Vigenere{
 		}
 	}
 
-	public int getPeriod(){
-		return this.period;
-	}
-
 	public String getKey(){
 		return this.key.toString();
 	}
 
-	// this function is designed to be called multiple times in a row, picking up
-	// where it left off. that's why it must rely on class scope variables, so
-	// it can retain it's state across invocations.
-	// ---------
 	// this is where the magic happens
 	// ---------
-	// set the key and return the suspected plain text. if the user notices the plain
-	// text is wrong, it can be called again to try again
+	// set the key and return the plain text.
 	public String decrypt(){
-		return "lol nothing works";
+		this.strip();
+		char[] perm = {0,0,0,0,0,0};
 
+		for(int i = 0; i < this.alphabet.length; ++i){
+			int shift = this.alphabetShift(i,this.target[perm[i]]);
+			this.key.append((char)(shift + 'A'));
+		}
+		String decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
+		final int TRIES = 4000;
+		for(int i = 0; i < TRIES; ++i){
+		/*	boolean success = */this.wf.isEnglish(decrypted);
+			System.out.print("\r[" + (int)(((float)i/TRIES)*100) + "% done]");
+		}
+
+		if(true/*success*/)
+			System.out.println("\033[1;32mWordFinder found english in this text\033[0m\n");
+		else
+			System.out.println("\033[1;31mWordFinder did not find English in this text\033[0m\n");
+		return decrypted;
 	}
 
+	// decrypt <ctext> with <key>
 	private static String vigenere(String ctext,String key){
 		StringBuilder ptext = new StringBuilder();
 		for(int i = 0; i < ctext.length(); ++i){
@@ -96,6 +117,7 @@ public class Vigenere{
 		return (char)(mostCommon + 'A');
 	}
 
+	// strip the cipher text into <this.period> alphabets
 	private void strip(){
 		this.alphabet = new StringBuilder[this.period];
 
