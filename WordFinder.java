@@ -7,10 +7,10 @@ public class WordFinder{
 
 	private String[] word;
 	public static final int WORD_COUNT = 10;
-	public static final int MIN_LETTERS = 4;
+	public static final int MIN_LETTERS = 6;
 	public boolean valid;
 
-	private static final int DICTIONARY_LENGTH = 86000;
+	private static final int DICTIONARY_LENGTH = 61500;
 
 	public WordFinder(){
 		// load the file
@@ -30,10 +30,9 @@ public class WordFinder{
 		// fill the this.word list
 		int index = 0;
 		while(wordsFile.hasNextLine()){
-			String s = wordsFile.nextLine();
+			String s = wordsFile.nextLine().toLowerCase();
 			if(s.length() >= WordFinder.MIN_LETTERS){
 				this.word[index++] = new String(s);
-				if(this.word[index-1].equals("english"))System.out.println("\033[1;37mFOUND IT\033[0m");
 			}
 		}
 
@@ -61,7 +60,7 @@ public class WordFinder{
 		// loop through all the words in the words list
 		int foundWordsIndex = 0;
 		for(int i = 0; i < this.word.length; ++i){
-			// don't find words that have already been found
+			// don't find words that have already been founj
 			boolean conflict = false;
 			for(int j = 0; j < WordFinder.WORD_COUNT; ++j){
 				if(this.word[i].equals(foundWords[j])){
@@ -72,10 +71,8 @@ public class WordFinder{
 			if(conflict)
 				continue;
 
-			// do the regex bit
-			Pattern p = Pattern.compile(".*" + this.word[i] + ".*", Pattern.CASE_INSENSITIVE);
-			Matcher m = p.matcher(text);
-			if(m.find() && this.word[i].length() >= WordFinder.MIN_LETTERS){
+			// look for any occurrence of <this.word[i]> in <text>
+			if(text.contains(this.word[i])){
 				foundWords[foundWordsIndex++] = this.word[i];
 
 				if(foundWordsIndex == WORD_COUNT){
@@ -87,13 +84,14 @@ public class WordFinder{
 					return true;
 				}
 			}
+			/*System.out.print("\r\033[32;1m[" + (int)(((float)i/this.word.length)*100) + "% done] (found " + foundWordsIndex + " so far)\033[0m");*/
 		}
 
-		System.out.println("foundWordsIndex == " + foundWordsIndex);
+		//System.out.println("foundWordsIndex == " + foundWordsIndex);
 		// print the found words list
-		for(int i = 0; i < foundWords.length; ++i){
+		/*for(int i = 0; i < foundWords.length; ++i){
 			System.out.println("\033[31mthis.foundWords[" + i + "] == \"" + foundWords[i] + "\";\033[0m");
-		}
+		}*/
 		return false;
 	}
 }
