@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 
 public class Dictionary{
-	public static final int DICTIONARY_LENGTH = 52864; // divisible by 8
+	public static final int DICTIONARY_LENGTH = 52896; // divisible by 4, 8, 12, 16, 32
 	public String[] word;
 
 	public Dictionary(){
