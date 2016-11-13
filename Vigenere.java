@@ -44,30 +44,31 @@ public class Vigenere{
 	// ---------
 	// set the key and return the plain text.
 	public String decrypt(int lower, int upper){
+		String decrypted = null;
 		for(this.period = 1; this.period < upper + 1; ++this.period){
-			String decrypted = null;
+			decrypted = null;
 			boolean success = false;
-			this.strip();
+			this.strip(); // strip the cipher text into <this.period> alphabets
 			Permuter perm = new Permuter(this.period);
 
 			while(!success){
 				WordFinder wf = new WordFinder(this.dict);
 				this.key.setLength(0);
 				char[] p = perm.nextPerm();
-					if(p == null){
+				if(p == null){
 					// tried all permutations and didn't find the plaintext
 					decrypted = null;
 					break;
 				}
 
-					// generate the key
-					for(int i = 0; i < this.alphabet.length; ++i){
-						int shift = this.alphabetShift(i,p[i]);
+				// generate the key
+				for(int i = 0; i < this.alphabet.length; ++i){
+					int shift = this.alphabetShift(i,p[i]);
 					this.key.append((char)(shift + 'A'));
-			}
+				}
 
-					// decrypt given the key
-					decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
+				// decrypt given the key
+				decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
 
 				// use dictionary search to see if it's right
 				success = wf.isEnglish(decrypted);
@@ -75,9 +76,10 @@ public class Vigenere{
 					this.foundWords = wf.getFoundWords();
 				}
 			}
-
-			return decrypted;
+			if(success)
+				break;
 		}
+		return decrypted;
 	}
 
 	// decrypt <ctext> with <key>

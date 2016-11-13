@@ -24,7 +24,7 @@ public class Main{
 		System.out.println("\033[33mEncrypted text:\033[0m\n" + s + "\n");
 
 		// decrypt it
-		String decrypted = v.decrypt();
+		String decrypted = v.decrypt(1,12);
 
 		if(decrypted != null){
 			// show the decrypted text
