@@ -1,8 +1,8 @@
 import java.lang.Thread;
 
 public class WordFinder extends Thread{
-	public static final int WORD_COUNT = 10; // how many words to look for
-	public static final int MIN_LETTERS = 6; // only count words with at least this many letters
+	public static final int WORD_COUNT = 12; // how many words to look for
+	public static final int MIN_LETTERS = 7; // only count words with at least this many letters
 
 	private static final int WORKER_COUNT = 8; // reasonable assumption for # of logical processors
 	private static final int WORKLOAD = Dictionary.DICTIONARY_LENGTH / WordFinder.WORKER_COUNT; // workload for each worker
