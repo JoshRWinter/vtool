@@ -13,18 +13,18 @@
    This solver works best on large sets of english text, with short keys.
  */
 public class Vigenere{
-	private StringBuilder ctext;
+	private StringBuilder ctext; // target ciphertext
 	private StringBuilder[] alphabet; // the stripped alphabets
 	private StringBuilder key;
-	private int period;
-	private final char[] target = {'e','t','a','o'}; // most common english letters
-	private WordFinder wf;
+	private int period; // proposed length of key
+	private Dictionary dict;
+	private String[] foundWords; // the words that were found in the suspected plaintext
 
 	public Vigenere(String text){
 		this.period = 6;
 		this.key = new StringBuilder();
 		this.ctext = new StringBuilder(text.length());
-		this.wf = new WordFinder();
+		this.dict = new Dictionary();
 
 		// set cipher text to all caps with no puct or spaces, just letters
 		for(int i = 0; i < text.length(); ++i){
@@ -37,28 +37,45 @@ public class Vigenere{
 		return this.key.toString();
 	}
 
+	public String[] getFoundWords(){
+		return this.foundWords;
+	}
+
 	// this is where the magic happens
 	// ---------
 	// set the key and return the plain text.
 	public String decrypt(){
+		String decrypted = null;
+		boolean success = false;
 		this.strip();
-		char[] perm = {0,0,0,0,0,0};
+		Permuter perm = new Permuter(this.period);
 
-		for(int i = 0; i < this.alphabet.length; ++i){
-			int shift = this.alphabetShift(i,this.target[perm[i]]);
-			this.key.append((char)(shift + 'A'));
-		}
-		String decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
-		final int TRIES = 1; //729;
-		for(int i = 0; i < TRIES; ++i){
-		/*	boolean success = */this.wf.isEnglish(decrypted);
-			System.out.print("\r[" + (int)(((float)i/TRIES)*100) + "% done]");
+		while(!success){
+			WordFinder wf = new WordFinder(this.dict);
+			this.key.setLength(0);
+			char[] p = perm.nextPerm();
+			if(p == null){
+				// tried all permutations and didn't find the plaintext
+				decrypted = null;
+				break;
+			}
+
+			// generate the key
+			for(int i = 0; i < this.alphabet.length; ++i){
+				int shift = this.alphabetShift(i,p[i]);
+				this.key.append((char)(shift + 'A'));
+			}
+
+			// decrypt given the key
+			decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
+
+			// use dictionary search to see if it's right
+			success = wf.isEnglish(decrypted);
+			if(success){
+				this.foundWords = wf.getFoundWords();
+			}
 		}
 
-		if(true/*success*/)
-			System.out.println("\033[1;32mWordFinder found english in this text\033[0m\n");
-		else
-			System.out.println("\033[1;31mWordFinder did not find English in this text\033[0m\n");
 		return decrypted;
 	}
 
