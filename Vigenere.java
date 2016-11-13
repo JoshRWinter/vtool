@@ -6,7 +6,6 @@
    The shift that is applied will use 4 of the most common english letter frequencies,
    "e, t, a, o".
 
-   First, try with a period of 1, then keep going up to period MAX_PERIOD.
    the WordFinder class will be needed to determine if valid plaintext results
    from the decrypt() method of this class.
 
@@ -108,12 +107,6 @@ public class Vigenere{
 			return mostCommon - target;
 		else
 			return (mostCommon - target) + 26;
-	}
-
-	// return true if the most common letter in a string is plausible for english
-	private static boolean plausible(String s){
-		char mostCommon = Vigenere.findMostCommon(s);
-		return mostCommon == 'E' || mostCommon == 'T' || mostCommon == 'A' || mostCommon == 'O';
 	}
 
 	// search for and return the most common character in a String
