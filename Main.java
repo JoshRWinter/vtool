@@ -17,12 +17,30 @@ public class Main{
 			return;
 		}
 
-		Vigenere v;
 		String s = filename.nextLine();
-		v = new Vigenere(s);
+		Vigenere v = new Vigenere(s);
+
+		// show the encrypted text
 		System.out.println("\033[33mEncrypted text:\033[0m\n" + s + "\n");
-		System.out.println("\033[33mDecrypted text:\n\033[1;37m" + v.decrypt() + "\033[0m\n\n");
-		System.out.println("\nThe key is \"\033[32m" + v.getKey() + "\033[0m\"");
+
+		// decrypt it
+		String decrypted = v.decrypt();
+
+		if(decrypted != null){
+			// show the decrypted text
+			System.out.println("\033[33mDecrypted text:\n\033[1;37m" + decrypted + "\033[0m\n\n");
+			// show the key
+			System.out.println("\nThe key is \"\033[1;32m" + v.getKey() + "\033[0m\"");
+			// show the matched words that verified this plaintext
+			System.out.println("These are the words that verified the plain text:");
+			if(decrypted != null){
+				String[] foundWords = v.getFoundWords();
+				for(int i = 0; i < foundWords.length; ++i)
+					System.out.println(i + ": \"\033[32m" + foundWords[i] + "\033[0m\"");
+			}
+		}
+		else
+			System.out.println("\033[1;31mvtool could not decrypt this message\033[0m");
 	}
 }
 
