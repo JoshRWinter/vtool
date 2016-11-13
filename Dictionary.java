@@ -3,7 +3,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class Dictionary{
-	public static final int DICTIONARY_LENGTH = 61504; // divisible by 8
+	public static final int DICTIONARY_LENGTH = 52864; // divisible by 8
 	public String[] word;
 
 	public Dictionary(){
@@ -17,7 +17,7 @@ public class Dictionary{
 		}
 
 		// allocate
-		this.word = new String[Dictionary.DICTIONARY_LENGTH]; // file "american_english" contains around 61,000 words
+		this.word = new String[Dictionary.DICTIONARY_LENGTH]; // file "american_english" contains 52,855 words
 
 		// fill the word list
 		int index = 0;
