@@ -43,39 +43,41 @@ public class Vigenere{
 	// this is where the magic happens
 	// ---------
 	// set the key and return the plain text.
-	public String decrypt(){
-		String decrypted = null;
-		boolean success = false;
-		this.strip();
-		Permuter perm = new Permuter(this.period);
+	public String decrypt(int lower, int upper){
+		for(this.period = 1; this.period < upper + 1; ++this.period){
+			String decrypted = null;
+			boolean success = false;
+			this.strip();
+			Permuter perm = new Permuter(this.period);
 
-		while(!success){
-			WordFinder wf = new WordFinder(this.dict);
-			this.key.setLength(0);
-			char[] p = perm.nextPerm();
-			if(p == null){
-				// tried all permutations and didn't find the plaintext
-				decrypted = null;
-				break;
+			while(!success){
+				WordFinder wf = new WordFinder(this.dict);
+				this.key.setLength(0);
+				char[] p = perm.nextPerm();
+					if(p == null){
+					// tried all permutations and didn't find the plaintext
+					decrypted = null;
+					break;
+				}
+
+					// generate the key
+					for(int i = 0; i < this.alphabet.length; ++i){
+						int shift = this.alphabetShift(i,p[i]);
+					this.key.append((char)(shift + 'A'));
 			}
 
-			// generate the key
-			for(int i = 0; i < this.alphabet.length; ++i){
-				int shift = this.alphabetShift(i,p[i]);
-				this.key.append((char)(shift + 'A'));
+					// decrypt given the key
+					decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
+
+				// use dictionary search to see if it's right
+				success = wf.isEnglish(decrypted);
+				if(success){
+					this.foundWords = wf.getFoundWords();
+				}
 			}
 
-			// decrypt given the key
-			decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
-
-			// use dictionary search to see if it's right
-			success = wf.isEnglish(decrypted);
-			if(success){
-				this.foundWords = wf.getFoundWords();
-			}
+			return decrypted;
 		}
-
-		return decrypted;
 	}
 
 	// decrypt <ctext> with <key>
