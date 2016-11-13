@@ -4,8 +4,8 @@ public class WordFinder extends Thread{
 	public static final int WORD_COUNT = 12; // how many words to look for
 	public static final int MIN_LETTERS = 7; // only count words with at least this many letters
 
-	private static final int WORKER_COUNT = 8; // reasonable assumption for # of logical processors
-	private static final int WORKLOAD = Dictionary.DICTIONARY_LENGTH / WordFinder.WORKER_COUNT; // workload for each worker
+	private int worker_count; // number of threads to use
+	private int workload;
 
 	public String[] foundWords;
 	public int foundWordsIndex;
@@ -16,6 +16,13 @@ public class WordFinder extends Thread{
 		this.foundWords = new String[WordFinder.WORD_COUNT];
 		this.foundWordsIndex = 0;
 		this.dict = dict;
+
+		int logicals = Runtime.getRuntime().availableProcessors();
+		if(logicals == 4 || logicals == 8 || logicals == 12 || logicals == 16 || logicals == 32)
+			this.worker_count = logicals;
+		else
+			this.worker_count = 8;
+		this.workload = Dictionary.DICTIONARY_LENGTH / this.worker_count;
 	}
 
 	public String[] getFoundWords(){
@@ -44,16 +51,16 @@ public class WordFinder extends Thread{
 		for(int i = 0; i < WordFinder.WORD_COUNT; ++i)
 			this.foundWords[i] = new String("");
 
-		WordFinderWorker[] worker = new WordFinderWorker[WordFinder.WORKER_COUNT];
+		WordFinderWorker[] worker = new WordFinderWorker[this.worker_count];
 
 		// spawn the workers
-		for(int i = 0; i < WordFinder.WORKER_COUNT; ++i){
-			worker[i] = new WordFinderWorker(this, text, i * WordFinder.WORKLOAD, (i * WordFinder.WORKLOAD) + WORKLOAD, i);
+		for(int i = 0; i < this.worker_count; ++i){
+			worker[i] = new WordFinderWorker(this, text, i * this.workload, (i * this.workload) + this.workload, i);
 			worker[i].start();
 		}
 
 		// wait for workers to finish
-		for(int i = 0; i < WordFinder.WORKER_COUNT; ++i){
+		for(int i = 0; i < this.worker_count; ++i){
 			try{
 				worker[i].join();
 			}catch(Exception e){
