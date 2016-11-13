@@ -28,7 +28,7 @@ public class Main{
 
 		if(decrypted != null){
 			// show the decrypted text
-			System.out.println("\033[33mDecrypted text:\n\033[1;37m" + decrypted + "\033[0m\n\n");
+			System.out.println("\033[33mDecrypted text:\033[0m\n\033[1m" + decrypted + "\033[0m\n\n");
 			// show the key
 			System.out.println("\nThe key is \"\033[1;32m" + v.getKey() + "\033[0m\"");
 			// show the matched words that verified this plaintext
