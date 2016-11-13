@@ -1,6 +1,7 @@
-import java.util.Scanner;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 public class Dictionary{
 	public static final int DICTIONARY_LENGTH = 52864; // divisible by 8
@@ -8,24 +9,28 @@ public class Dictionary{
 
 	public Dictionary(){
 		// load the file
-		Scanner wordsFile;
-		try{
-		   wordsFile = new Scanner(new File("american-english"));
-		}catch(FileNotFoundException fnf){
-			System.err.println("\033[31merror: could not find words file \"american_english\"\033[0m");
-			return;
+		InputStream is = getClass().getResourceAsStream("/american-english");
+		if(is == null){
+			System.err.println("\033[31;1man error occurred while trying to open dictionary file\033[0m");
+			System.exit(1);
 		}
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 		// allocate
 		this.word = new String[Dictionary.DICTIONARY_LENGTH]; // file "american_english" contains 52,855 words
 
 		// fill the word list
 		int index = 0;
-		while(wordsFile.hasNextLine()){
-			String s = wordsFile.nextLine().toLowerCase();
-			if(s.length() >= WordFinder.MIN_LETTERS){
-				this.word[index++] = s;
+		String s = null;
+		try{
+			while((s = br.readLine()) != null){
+				s.toLowerCase();
+				if(s.length() >= WordFinder.MIN_LETTERS){
+					this.word[index++] = s;
+				}
 			}
+		}catch(Exception ioe){
+			System.out.println("\033[31;1man error occurred while reading dictionary file:\n" + ioe.getLocalizedMessage() + "\033[0m");
 		}
 
 		// fill the rest of 'em up with empties
@@ -33,7 +38,11 @@ public class Dictionary{
 			this.word[i] = new String("");
 		}
 
-		wordsFile.close();
+		try{
+			br.close();
+		}catch(Exception e){
+			System.out.println("\033[31;1man error occurred when attempting to close input stream\033[0m");
+		}
 	}
 
 	public void print(){
