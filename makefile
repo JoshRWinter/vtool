@@ -1,5 +1,8 @@
-all: Main.class Vigenere.class WordFinder.class WordFinderWorker.class Permuter.class Dictionary.class
-	java Main
+all: vtool.jar
+	java -jar vtool.jar
+
+vtool.jar: Main.class Vigenere.class WordFinder.class WordFinderWorker.class Permuter.class Dictionary.class american-english
+	jar cfm vtool.jar manifest *.class american-english
 
 Main.class: Main.java
 	javac Main.java
