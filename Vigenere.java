@@ -50,53 +50,74 @@ public class Vigenere extends Thread{
 	// ---------
 	// set the key and return the plain text.
 	public void run(){
+		String configuration = "e"; // start with this, contains the letters to assume are the most common in each stripped alphabet
 		String decrypted = null;
-		for(this.period = 1; this.period < upper + 1; ++this.period){
+		boolean success = false;
+		boolean giveUp = false;
+		char[] p = null; // for the permutation array
+		while(!giveUp){ // try different target configurations until give up
+			for(this.period = 1; this.period < upper + 1; ++this.period){ // try range of keys
 
-			decrypted = null;
-			boolean success = false;
-			this.strip(); // strip the cipher text into <this.period> alphabets
-			Permuter perm = new Permuter(this.period);
+				decrypted = null;
+				success = false;
+				this.strip(); // strip the cipher text into <this.period> alphabets
+				Permuter perm = new Permuter(this.period, configuration);
 
-			while(!success){
-				WordFinder wf = new WordFinder(this.dict);
+				while(!success){
+					WordFinder wf = new WordFinder(this.dict);
 
-				// set the status, but only necessary to do it sometimes
-				int counter = perm.getCounter();
-				if(counter % 10 == 0)
-					this.vtool.status(new VtoolStatus(
-						"working: period " + this.period + ", " + (int)((counter/Math.pow(3,this.period))*100) + "%",
-						counter/(int)Math.pow(3,this.period),
-						null
-					));
+					// set the status, but only necessary to do it sometimes
+					int counter = perm.getCounter();
+					if(counter % 12 == 0)
+						this.vtool.status(new VtoolStatus(
+							"working: period=" + this.period + ", conf=" + configuration + ", " + (int)((counter/Math.pow(3,this.period))*100) + "%",
+							counter/(int)Math.pow(3,this.period),
+							null
+						));
 
-				this.key.setLength(0);
-				char[] p = perm.nextPerm();
-				if(p == null){
-					// tried all permutations and didn't find the plaintext
-					decrypted = null;
+					this.key.setLength(0);
+					p = perm.nextPerm();
+					if(p == null){
+						// tried all permutations and didn't find the plaintext
+						decrypted = null;
+						break;
+					}
+
+					// generate the key
+					for(int i = 0; i < this.alphabet.length; ++i){
+						int shift = this.alphabetShift(i,p[i]);
+						this.key.append((char)(shift + 'A'));
+					}
+
+					// decrypt given the key
+					decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
+
+					// use dictionary search to see if it's right
+					success = wf.isEnglish(decrypted);
+					if(success){
+						this.foundWords = wf.getFoundWords();
+					}
+				}
+				if(success)
 					break;
-				}
-
-				// generate the key
-				for(int i = 0; i < this.alphabet.length; ++i){
-					int shift = this.alphabetShift(i,p[i]);
-					this.key.append((char)(shift + 'A'));
-				}
-
-				// decrypt given the key
-				decrypted = Vigenere.vigenere(this.ctext.toString(), this.key.toString());
-
-				// use dictionary search to see if it's right
-				success = wf.isEnglish(decrypted);
-				if(success){
-					this.foundWords = wf.getFoundWords();
+			}
+			if(!success){
+				if(configuration.equals("e"))
+					configuration = "et";
+				else if(configuration.equals("et"))
+					configuration = "eta";
+				else{
+					giveUp = true; // don't bother trying "etao", would just take too long, give up.
+					decrypted = "!";
 				}
 			}
-			if(success)
-				break;
+			else break;
+
 		}
-		this.vtool.status(new VtoolStatus("done!", 100, decrypted));
+		StringBuilder pstring = new StringBuilder(p.length);
+		for(int i = 0; i < p.length; ++i)
+			pstring.append(p[i]);
+		this.vtool.status(new VtoolStatus("done! period=" + this.period + ", conf=" + configuration + ", perm=" + pstring.toString(), 100, decrypted));
 	}
 
 	// decrypt <ctext> with <key>

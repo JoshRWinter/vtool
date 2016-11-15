@@ -30,14 +30,17 @@ public class Permuter{
 	private int n;
 	private int counter; // which permutation is it currently on
 
-	public Permuter(int n){
+	private String elements; // the targets to permute
+
+	public Permuter(int n, String elements){
 		this.n = n;
+		this.elements = elements;
 		this.target = new char[this.n];
 		this.copy = new char[this.n];
 		this.counter = 0;
 
 		for(int i = 0; i < this.n; ++i)
-			this.target[i] = 'e';
+			this.target[i] = this.elements.charAt(0);
 	}
 
 	public int getCounter(){
@@ -58,7 +61,7 @@ public class Permuter{
 		int focus = this.n - 1;
 		while(focus >= 0){
 			this.target[focus] = this.nextTarget(this.target[focus]);
-			if(this.target[focus] == 'e'){
+			if(this.target[focus] == this.elements.charAt(0)){
 				--focus;
 			}
 			else
@@ -71,20 +74,26 @@ public class Permuter{
 		return this.copy;
 	}
 
+	// no more permutations?
 	private boolean finished(){
 		for(int i = 0; i < this.n; ++i){
-			if(this.target[i] != 'a')
+			if(this.target[i] != this.elements.charAt(this.elements.length() - 1))
 				return false;
 		}
 		return true;
 	}
 
 	private char nextTarget(char c){
-		switch(c){
-		case 'e': return 't';
-		case 't': return 'a';
-		case 'a': return 'e';
-		}
-		return '\000';
+		if(c == this.elements.charAt(this.elements.length() - 1))
+			return this.elements.charAt(0);
+
+		// find <c> in <this.elements> and return the next char in the string after <c>
+		int index;
+		for(int i = 0; i < this.elements.length(); ++i)
+			if(c == this.elements.charAt(i))
+				return this.elements.charAt(i+1);
+
+		// shouldn't ever get to this point i hope
+		return '!';
 	}
 }
