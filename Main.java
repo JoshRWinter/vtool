@@ -30,18 +30,19 @@ public class Main{
 		VtoolStatus status;
 		do{
 			try{
-				Thread.sleep(300);
+				Thread.sleep(200);
 			}catch(Exception e){};
 			status = v.status(null);
+			System.out.print("\r                                ");
 			System.out.print("\r\033[32m" + status.status + "\033[0m");
 		}while(status.decrypted == null);
 		System.out.println();
 
 		if(!status.decrypted.equals("!")){
 			// show the decrypted text
-			System.out.println("\033[33mDecrypted text:\033[0m\n\033[1m" + status.decrypted + "\033[0m\n\n");
+			System.out.println("\033[33mDecrypted text:\033[0m\n\033[1m" + status.decrypted + "\033[0m\n");
 			// show the key
-			System.out.println("\nThe key is \"\033[1;32m" + v.getKey() + "\033[0m\"");
+			System.out.println("The key is \"\033[1;32m" + v.getKey() + "\033[0m\"");
 			// show the matched words that verified this plaintext
 			System.out.println("These are the words that verified the plain text:");
 			String[] foundWords = v.getFoundWords();
