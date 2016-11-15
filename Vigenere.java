@@ -11,7 +11,7 @@
 
    This solver works best on large sets of english text, with short keys.
  */
-public class Vigenere{
+public class Vigenere extends Thread{
 	private StringBuilder ctext; // target ciphertext
 	private StringBuilder[] alphabet; // the stripped alphabets
 	private StringBuilder key;
@@ -19,8 +19,14 @@ public class Vigenere{
 	private Dictionary dict;
 	private String[] foundWords; // the words that were found in the suspected plaintext
 
-	public Vigenere(String text){
-		this.period = 6;
+	private int lower, upper;
+	public Vtool vtool;
+
+	public Vigenere(Vtool vtool, String text, int lower, int upper){
+		this.lower = lower;
+		this.upper = upper;
+		this.vtool = vtool;
+
 		this.key = new StringBuilder();
 		this.ctext = new StringBuilder(text.length());
 		this.dict = new Dictionary();
@@ -43,9 +49,10 @@ public class Vigenere{
 	// this is where the magic happens
 	// ---------
 	// set the key and return the plain text.
-	public String decrypt(int lower, int upper){
+	public void run(){
 		String decrypted = null;
 		for(this.period = 1; this.period < upper + 1; ++this.period){
+
 			decrypted = null;
 			boolean success = false;
 			this.strip(); // strip the cipher text into <this.period> alphabets
@@ -53,6 +60,16 @@ public class Vigenere{
 
 			while(!success){
 				WordFinder wf = new WordFinder(this.dict);
+
+				// set the status, but only necessary to do it sometimes
+				int counter = perm.getCounter();
+				if(counter % 10 == 0)
+					this.vtool.status(new VtoolStatus(
+						"working: period " + this.period + ", " + (int)((counter/Math.pow(3,this.period))*100) + "%",
+						counter/(int)Math.pow(3,this.period),
+						null
+					));
+
 				this.key.setLength(0);
 				char[] p = perm.nextPerm();
 				if(p == null){
@@ -79,7 +96,7 @@ public class Vigenere{
 			if(success)
 				break;
 		}
-		return decrypted;
+		this.vtool.status(new VtoolStatus("done!", 100, decrypted));
 	}
 
 	// decrypt <ctext> with <key>
