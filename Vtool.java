@@ -4,7 +4,7 @@ public class Vtool{
 
 	public Vtool(String text, int lower, int upper){
 		this.vig = new Vigenere(this, text, lower, upper);
-		this.status = new VtoolStatus("",0,null);
+		this.status = new VtoolStatus("",0,null, 0);
 	}
 
 	public String getKey(){
