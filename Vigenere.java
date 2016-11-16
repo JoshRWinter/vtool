@@ -51,12 +51,21 @@ public class Vigenere extends Thread{
 	// set the key and return the plain text.
 	public void run(){
 		String configuration = "e"; // start with this, contains the letters to assume are the most common in each stripped alphabet
+								    // this will grow to "et" and finally "eta"
+		int attempt = 0; // total number of attempts
 		String decrypted = null;
-		boolean success = false;
-		boolean giveUp = false;
+		boolean success = false; // plain text found!
+		boolean giveUp = false; // tried all target configurations
 		char[] p = null; // for the permutation array
+		int ioc = Vigenere.indexOfCoincedence(this.ctext.toString()); // try to guess key size given index of coincedence
+		System.out.println("ioc suggests period " + ioc);
+
 		while(!giveUp){ // try different target configurations until give up
-			for(this.period = 1; this.period < upper + 1; ++this.period){ // try range of keys
+			boolean tryingIOC = true;
+			for(this.period = ioc; this.period < upper + 1; ++this.period){ // try range of keys
+
+				if(!tryingIOC && this.period == ioc)
+					continue; // already tried the ioc key length
 
 				decrypted = null;
 				success = false;
@@ -64,15 +73,17 @@ public class Vigenere extends Thread{
 				Permuter perm = new Permuter(this.period, configuration);
 
 				while(!success){
+					++attempt;
 					WordFinder wf = new WordFinder(this.dict);
 
 					// set the status, but only necessary to do it sometimes
 					int counter = perm.getCounter();
 					if(counter % 12 == 0)
 						this.vtool.status(new VtoolStatus(
-							"working: period=" + this.period + ", conf=" + configuration + ", " + (int)((counter/Math.pow(3,this.period))*100) + "%",
+							"working: period=" + this.period + ", conf=" + configuration + ", " + (int)((counter/Math.pow(configuration.length(),this.period))*100) + "%",
 							counter/(int)Math.pow(3,this.period),
-							null
+							null,
+							attempt
 						));
 
 					this.key.setLength(0);
@@ -100,6 +111,10 @@ public class Vigenere extends Thread{
 				}
 				if(success)
 					break;
+				if(tryingIOC){
+					tryingIOC = false;
+					period = 1;
+				}
 			}
 			if(!success){
 				if(configuration.equals("e"))
@@ -117,7 +132,7 @@ public class Vigenere extends Thread{
 		StringBuilder pstring = new StringBuilder(p.length);
 		for(int i = 0; i < p.length; ++i)
 			pstring.append(p[i]);
-		this.vtool.status(new VtoolStatus("done! period=" + this.period + ", conf=" + configuration + ", perm=" + pstring.toString(), 100, decrypted));
+		this.vtool.status(new VtoolStatus("done! period=" + this.period + ", conf=" + configuration + ", perm=" + pstring.toString() + " attempts=" + attempt, 100, decrypted, attempt));
 	}
 
 	// decrypt <ctext> with <key>
@@ -183,6 +198,45 @@ public class Vigenere extends Thread{
 					this.alphabet[i].append(this.ctext.charAt(j));
 			}
 		}
+	}
+
+	// calculates index of coincedence and returns suspected key period
+	public static int indexOfCoincedence(String text){
+		int[] lf = new int[26];
+		for(int i = 0; i < text.length(); ++i)
+			++lf[text.charAt(i) - 'A'];
+
+		double sum = 0.0;
+		for(int i = 0; i < 26; ++i)
+			sum = sum + (lf[i] * (lf[i] - 1.0));
+
+		sum = sum * (1.0 / (text.length() * (text.length() - 1.0)));
+
+		double[] ioctable = {
+			0.0,	// 0
+			0.0660, // 1
+			0.0520, // 2
+			0.0473, // 3
+			0.0449, // 4
+			0.0435, // 5
+			0.0426, // 6
+			0.0419, // 7
+			0.0414, // 8
+			0.0410, // 9
+			0.0407  // 10
+		};
+
+		double[] difference = new double[10];
+		// find out which value in the table above most closely matches <sum>
+		for(int i = 0; i < 10; ++i)
+			difference[i] = Math.abs(ioctable[i] - sum);
+
+		int smallestDifference = 0;
+		for(int i = 0; i < 10; ++i)
+			if(difference[i] < difference[smallestDifference])
+				smallestDifference = i;
+
+		return smallestDifference;
 	}
 
 	private boolean isValidChar(char c){
