@@ -4,7 +4,7 @@
 
    Then a shift is applied to each alphabet in order to solve the text.
    The shift that is applied will use 4 of the most common english letter frequencies,
-   "e, t, a, o".
+   "e, t, a".
 
    the WordFinder class will be needed to determine if valid plaintext results
    from the decrypt() method of this class.
@@ -58,7 +58,6 @@ public class Vigenere extends Thread{
 		boolean giveUp = false; // tried all target configurations
 		char[] p = null; // for the permutation array
 		int ioc = Vigenere.indexOfCoincedence(this.ctext.toString()); // try to guess key size given index of coincedence
-		System.out.println("ioc suggests period " + ioc);
 
 		while(!giveUp){ // try different target configurations until give up
 			boolean tryingIOC = true;
