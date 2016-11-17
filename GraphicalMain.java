@@ -16,13 +16,15 @@ public class GraphicalMain extends JFrame{
 	private JButton button;
 	private JTextArea text;
 	private JLabel vstatus;
+	private int ioc;
 
 	private Vtool vtool;
 
 	public GraphicalMain(){
+		this.vtool = null;
 
 		// setup the button
-		this.button = new JButton("this is a button");
+		this.button = new JButton("Decrypt");
 		this.button.addActionListener((ActionEvent e) -> {
 			String ctext = this.text.getText();
 			if(ctext.length() == 0)
@@ -30,16 +32,9 @@ public class GraphicalMain extends JFrame{
 
 			if(this.vtool == null){
 				this.vtool = new Vtool(ctext,1,12);
-				vtool.decrypt();
-				VtoolStatus status;
-				do{
-					status = this.vtool.status(null);
-					this.vstatus.setText(status.status);
-					repaint();
-				}while(status.decrypted == null);
-				this.text.setText(status.decrypted);
-				JOptionPane.showMessageDialog(null,status.status + "\nkey: " + this.vtool.getKey());
-				this.vtool = null;
+				this.ioc = Vigenere.indexOfCoincedence(this.vtool.getCText());
+				StatusUpdater su = new StatusUpdater(this);
+				su.start();
 			}
 		});
 
@@ -51,10 +46,10 @@ public class GraphicalMain extends JFrame{
 		scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		// other swing nonsense
-		JPanel bottom = new JPanel();
+		JPanel bottom = new JPanel(new BorderLayout());
 		add(scroller,BorderLayout.CENTER);
 		bottom.add(this.button,BorderLayout.CENTER);
-		this.vstatus = new JLabel("heyy");
+		this.vstatus = new JLabel("");
 		bottom.add(this.vstatus,BorderLayout.SOUTH);
 		add(bottom,BorderLayout.SOUTH);
 
@@ -67,5 +62,29 @@ public class GraphicalMain extends JFrame{
 
 	public static void main(String[] args){
 		GraphicalMain gm = new GraphicalMain();
+	}
+
+	public void setStatus(String text){
+		this.vstatus.setText(text);
+	}
+
+	public void setText(String text){
+		this.text.setText(text);
+		String msg = this.vstatus.getText() + "\nLogical Processors: " + WordFinder.processorCount() + "\nIOC suggested period " + this.ioc + "\nKey: \"" + this.vtool.getKey() + "\"\n\nThese words supported the plaintext:\n";
+
+		if(!text.equals("!")){ // "!" means vtool couldn't decrypt it
+			String[] foundWords = vtool.getFoundWords();
+			for(int i = 0; i < WordFinder.WORD_COUNT; ++i)
+				msg = msg + (i + 1) + ": " + foundWords[i] + "\n";
+		}
+		else
+			msg = "Vtool could not decrypt this message";
+
+		JOptionPane.showMessageDialog(this, msg);
+		this.vtool = null;
+	}
+
+	public Vtool vtool(){
+		return this.vtool;
 	}
 }

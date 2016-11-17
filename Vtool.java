@@ -19,6 +19,10 @@ public class Vtool{
 		return this.vig.getFoundWords();
 	}
 
+	public String getCText(){
+		return this.vig.getCText();
+	}
+
 	public void decrypt(){
 		this.vig.start();
 	}

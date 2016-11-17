@@ -16,12 +16,7 @@ public class WordFinder extends Thread{
 		this.foundWords = new String[WordFinder.WORD_COUNT];
 		this.foundWordsIndex = 0;
 		this.dict = dict;
-
-		int logicals = Runtime.getRuntime().availableProcessors();
-		if(logicals == 4 || logicals == 8 || logicals == 12 || logicals == 16 || logicals == 32)
-			this.worker_count = logicals;
-		else
-			this.worker_count = 8;
+		this.worker_count = WordFinder.processorCount();
 		this.workload = Dictionary.DICTIONARY_LENGTH / this.worker_count;
 	}
 
@@ -69,6 +64,15 @@ public class WordFinder extends Thread{
 		}
 
 		return this.foundWordsIndex == WordFinder.WORD_COUNT;
+	}
+
+	public static int processorCount(){
+		int worker_count;
+		int logicals = Runtime.getRuntime().availableProcessors();
+		if(logicals == 4 || logicals == 8 || logicals == 12 || logicals == 16 || logicals == 32)
+			return logicals;
+		else
+			return 8;
 	}
 }
 

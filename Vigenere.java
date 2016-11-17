@@ -42,6 +42,10 @@ public class Vigenere extends Thread{
 		return this.key.toString();
 	}
 
+	public String getCText(){
+		return this.ctext.toString();
+	}
+
 	public String[] getFoundWords(){
 		return this.foundWords;
 	}
@@ -85,9 +89,21 @@ public class Vigenere extends Thread{
 							attempt
 						));
 
-					this.key.setLength(0);
+					this.key.setLength(0); // clear the key from the previous attempt
+
 					p = perm.nextPerm();
-					if(p == null){
+					// skip permutations that have already been tried
+					if(p != null){
+						if(configuration.equals("et")){
+							while(!Vigenere.arrayContains(p,'t'))
+								p = perm.nextPerm();
+						}
+						else if(configuration.equals("eta")){
+							while(!Vigenere.arrayContains(p,'a'))
+								p = perm.nextPerm();
+						}
+					}
+					else if(p == null){
 						// tried all permutations and didn't find the plaintext
 						decrypted = null;
 						break;
@@ -128,9 +144,14 @@ public class Vigenere extends Thread{
 			else break;
 
 		}
-		StringBuilder pstring = new StringBuilder(p.length);
-		for(int i = 0; i < p.length; ++i)
-			pstring.append(p[i]);
+		StringBuilder pstring;
+		if(p != null){
+			pstring = new StringBuilder(p.length);
+			for(int i = 0; i < p.length; ++i)
+				pstring.append(p[i]);
+		}
+		else
+			pstring = new StringBuilder("nil");
 		this.vtool.status(new VtoolStatus("done! period=" + this.period + ", conf=" + configuration + ", perm=" + pstring.toString() + " attempts=" + attempt, 100, decrypted, attempt));
 	}
 
@@ -202,6 +223,9 @@ public class Vigenere extends Thread{
 	// calculates index of coincedence and returns suspected key period
 	public static int indexOfCoincedence(String text){
 		int[] lf = new int[26];
+		for(int i = 0; i < 26; ++i)
+			lf[i] = 0;
+
 		for(int i = 0; i < text.length(); ++i)
 			++lf[text.charAt(i) - 'A'];
 
@@ -243,6 +267,15 @@ public class Vigenere extends Thread{
 		return upper >= 'A' && upper <= 'Z'; // only valid char if uppercase letter.
 											 // this is so the solver can ignore whitespace
 									 		 // and only worry about letters
+	}
+
+	// look for char <c> in <arr>
+	private static boolean arrayContains(char[] arr, char c){
+		for(int i = 0; i < arr.length; ++i)
+			if(arr[i] == c)
+				return true;
+
+		return false;
 	}
 }
 
