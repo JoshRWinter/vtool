@@ -49,7 +49,7 @@ public class GraphicalMain extends JFrame{
 		JPanel bottom = new JPanel(new BorderLayout());
 		add(scroller,BorderLayout.CENTER);
 		bottom.add(this.button,BorderLayout.CENTER);
-		this.vstatus = new JLabel("");
+		this.vstatus = new JLabel("Vtool by Josh Winter");
 		bottom.add(this.vstatus,BorderLayout.SOUTH);
 		add(bottom,BorderLayout.SOUTH);
 
