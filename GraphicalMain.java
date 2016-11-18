@@ -61,7 +61,49 @@ public class GraphicalMain extends JFrame{
 	}
 
 	public static void main(String[] args){
-		GraphicalMain gm = new GraphicalMain();
+		boolean noGraphics = false;
+		boolean noColors = false;
+		boolean quiet = false;
+		String file = null;
+		if(args.length>0){
+			if(args[0].equals("--help") || args[0].equals("-h")){
+				System.out.println("Vtool by Josh Winter.\n" + 
+					"Usage: java -jar vtool.jar [--no-graphical] [--no-colors] [--quiet] [file]\n" +
+					"When run with no options, vtool will launch a graphical interface.\nWith option \"--no-graphical\", vtool will interact with you on the cmd line\n" + 
+					"When \"--no-colors\" is set, no ANSI escape color-codes will be used (Windows terminal probably won't like them, so use this option on windows...)\n" +
+					"When \"--quiet\" is used, only the decrypted plain text will be printed to stdout\n" +
+					"When a file is provided (in --no-graphical mode), vtool will use <file> instead of asking interactively."
+				);
+				System.exit(0);
+			}
+			if(GraphicalMain.argumentExists(args, "--no-graphical"))
+				noGraphics = true;
+			if(GraphicalMain.argumentExists(args, "--no-colors"))
+				noColors = true;
+			if(GraphicalMain.argumentExists(args, "--quiet"))
+				quiet = true;
+			file = args[args.length - 1];
+		}
+		if(noGraphics){
+			CMDMain.main(noColors,quiet,file);
+			noGraphics = false;
+		}
+		else{
+			try{
+				new GraphicalMain();
+			}catch(Exception e){
+				noGraphics = true;
+			}
+		}
+		if(noGraphics)
+			CMDMain.main(noColors,quiet,file);
+	}
+
+	private static boolean argumentExists(String[] args,String argument){
+		for(int i = 0; i < args.length; ++i)
+			if(args[i].equals(argument))
+				return true;
+		return false;
 	}
 
 	public void setStatus(String text){
