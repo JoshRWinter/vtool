@@ -2,5 +2,6 @@ this program will attempt to compute the key and return decrypted plaintext give
 
 compilation instructions:
 run `make`
+
 or compile .java files with `javac *.java` and jar it up with `jar cfm vtool.jar manifest *.class american-english`
 
