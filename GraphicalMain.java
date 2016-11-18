@@ -59,11 +59,15 @@ public class GraphicalMain extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e){
 		Object source = e.getSource();
 		if(source == this.encryptbutton){
-			String input = JOptionPane.showInputDialog(null, "Enter the key:");
-			if(input == null)
+			String text = this.text.getText();
+			if(text.length() == 0)
 				return;
 
-			String ctext = Vigenere.encrypt(this.text.getText(),input);
+			String input = JOptionPane.showInputDialog(null, "Enter the key:");
+			if(input == null || input.length() == 0)
+				return;
+
+			String ctext = Vigenere.encrypt(text,input);
 			this.text.setText(ctext);
 		}
 		else{
