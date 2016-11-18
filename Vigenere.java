@@ -173,6 +173,30 @@ public class Vigenere extends Thread{
 		return ptext.toString();
 	}
 
+	// encrypt <ptextString> with key <key>
+	public static String encrypt(String ptextString, String key){
+		StringBuilder ptext = new StringBuilder(ptextString.length());
+
+		// convert to uppercase, remove whitespace and incompatible characters
+		for(int i = 0; i < ptextString.length(); ++i){
+			char c = Character.toUpperCase(ptextString.charAt(i));
+			if(Vigenere.isValidChar(c))
+				ptext.append(c);
+		}
+
+		// do the thing
+		StringBuilder ctext = new StringBuilder(ptext.length());
+		for(int i = 0; i < ptext.length(); ++i){
+			char c = ptext.charAt(i);
+			c = (char)(c + (key.charAt(i % key.length()) - 'A'));
+			if(c > 'Z')
+				c = (char)(c - 26);
+			ctext.append(c);
+		}
+
+		return ctext.toString();
+	}
+
 	// this function, given the index into this.alphabet, will
 	// guess the shift that, once applied, yields plaintext
 	// for that alphabet. if it doesn't think that it is a valid
@@ -264,7 +288,7 @@ public class Vigenere extends Thread{
 		return smallestDifference;
 	}
 
-	private boolean isValidChar(char c){
+	private static boolean isValidChar(char c){
 		char upper = Character.toUpperCase(c);
 		return upper >= 'A' && upper <= 'Z'; // only valid char if uppercase letter.
 											 // this is so the solver can ignore whitespace

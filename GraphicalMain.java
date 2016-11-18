@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 public class GraphicalMain extends JFrame implements ActionListener{
 
 	private JButton button;
+	private JButton encryptbutton;
 	private JTextArea text;
 	private JLabel vstatus;
 	private int ioc;
@@ -28,6 +29,10 @@ public class GraphicalMain extends JFrame implements ActionListener{
 		this.button = new JButton("Decrypt");
 		this.button.addActionListener(this);
 
+		// setup the encrypt button
+		this.encryptbutton = new JButton("Encrypt");
+		this.encryptbutton.addActionListener(this);
+
 		// set up the text area
 		this.text = new JTextArea();
 		this.text.setLineWrap(true);
@@ -39,6 +44,7 @@ public class GraphicalMain extends JFrame implements ActionListener{
 		JPanel bottom = new JPanel(new BorderLayout());
 		add(scroller,BorderLayout.CENTER);
 		bottom.add(this.button,BorderLayout.CENTER);
+		bottom.add(this.encryptbutton,BorderLayout.NORTH);
 		this.vstatus = new JLabel("Vtool by Josh Winter");
 		bottom.add(this.vstatus,BorderLayout.SOUTH);
 		add(bottom,BorderLayout.SOUTH);
@@ -51,14 +57,25 @@ public class GraphicalMain extends JFrame implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e){
-		String ctext = this.text.getText();
-		if(ctext.length() == 0)
-			return;
-			if(this.vtool == null){
-			this.vtool = new Vtool(ctext,1,12);
-			this.ioc = Vigenere.indexOfCoincedence(this.vtool.getCText());
-			StatusUpdater su = new StatusUpdater(this);
-			su.start();
+		Object source = e.getSource();
+		if(source == this.encryptbutton){
+			String input = JOptionPane.showInputDialog(null, "Enter the key:");
+			if(input == null)
+				return;
+
+			String ctext = Vigenere.encrypt(this.text.getText(),input);
+			this.text.setText(ctext);
+		}
+		else{
+			String ctext = this.text.getText();
+			if(ctext.length() == 0)
+				return;
+				if(this.vtool == null){
+				this.vtool = new Vtool(ctext,1,12);
+				this.ioc = Vigenere.indexOfCoincedence(this.vtool.getCText());
+				StatusUpdater su = new StatusUpdater(this);
+				su.start();
+			}
 		}
 	}
 
