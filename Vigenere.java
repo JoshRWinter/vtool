@@ -176,6 +176,7 @@ public class Vigenere extends Thread{
 	// encrypt <ptextString> with key <key>
 	public static String encrypt(String ptextString, String key){
 		StringBuilder ptext = new StringBuilder(ptextString.length());
+		key = key.toUpperCase();
 
 		// convert to uppercase, remove whitespace and incompatible characters
 		for(int i = 0; i < ptextString.length(); ++i){
