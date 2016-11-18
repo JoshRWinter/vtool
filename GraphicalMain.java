@@ -10,8 +10,9 @@ import java.awt.BorderLayout;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JLabel;
+import java.awt.event.ActionListener;
 
-public class GraphicalMain extends JFrame{
+public class GraphicalMain extends JFrame implements ActionListener{
 
 	private JButton button;
 	private JTextArea text;
@@ -25,18 +26,7 @@ public class GraphicalMain extends JFrame{
 
 		// setup the button
 		this.button = new JButton("Decrypt");
-		this.button.addActionListener((ActionEvent e) -> {
-			String ctext = this.text.getText();
-			if(ctext.length() == 0)
-				return;
-
-			if(this.vtool == null){
-				this.vtool = new Vtool(ctext,1,12);
-				this.ioc = Vigenere.indexOfCoincedence(this.vtool.getCText());
-				StatusUpdater su = new StatusUpdater(this);
-				su.start();
-			}
-		});
+		this.button.addActionListener(this);
 
 		// set up the text area
 		this.text = new JTextArea();
@@ -58,6 +48,18 @@ public class GraphicalMain extends JFrame{
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
+	}
+	
+	public void actionPerformed(ActionEvent e){
+		String ctext = this.text.getText();
+		if(ctext.length() == 0)
+			return;
+			if(this.vtool == null){
+			this.vtool = new Vtool(ctext,1,12);
+			this.ioc = Vigenere.indexOfCoincedence(this.vtool.getCText());
+			StatusUpdater su = new StatusUpdater(this);
+			su.start();
+		}
 	}
 
 	public static void main(String[] args){
