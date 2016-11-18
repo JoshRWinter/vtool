@@ -62,6 +62,8 @@ public class Vigenere extends Thread{
 		boolean giveUp = false; // tried all target configurations
 		char[] p = null; // for the permutation array
 		int ioc = Vigenere.indexOfCoincedence(this.ctext.toString()); // try to guess key size given index of coincedence
+		if(ioc == 0)
+			ioc = 1;
 
 		while(!giveUp){ // try different target configurations until give up
 			boolean tryingIOC = true;
