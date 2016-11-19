@@ -154,7 +154,7 @@ public class Vigenere extends Thread{
 		}
 		else
 			pstring = new StringBuilder("nil");
-		this.vtool.status(new VtoolStatus("done! period=" + this.period + ", conf=" + configuration + ", perm=" + pstring.toString() + " attempts=" + attempt, 100, decrypted, attempt));
+		this.vtool.status(new VtoolStatus("done! period=" + this.period + ", conf=" + configuration + ", targets=" + pstring.toString() + " attempts=" + attempt, 100, decrypted, attempt));
 	}
 
 	// decrypt <ctext> with <key>
