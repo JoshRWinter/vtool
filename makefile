@@ -1,6 +1,3 @@
-all: vtool.jar
-	java -jar vtool.jar
-
 vtool.jar: GraphicalMain.class StatusUpdater.class CMDMain.class Vigenere.class WordFinder.class WordFinderWorker.class Permuter.class Dictionary.class Vtool.class VtoolStatus.class american-english
 	jar cfm vtool.jar manifest *.class american-english
 
