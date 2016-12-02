@@ -18,7 +18,8 @@ public class GraphicalMain extends JFrame implements ActionListener{
 	private JButton encryptbutton;
 	private JTextArea text;
 	private JLabel vstatus;
-	private int ioc;
+	private int ioc; // suggested key period
+	private double iocvalue; // raw ioc
 
 	private Vtool vtool;
 
@@ -86,6 +87,7 @@ public class GraphicalMain extends JFrame implements ActionListener{
 			if(this.vtool == null){
 				this.vtool = new Vtool(ctext,1,12);
 				this.ioc = Vigenere.indexOfCoincedence(this.vtool.getCText());
+				this.iocvalue = Vigenere.ioc(this.vtool.getCText());
 				StatusUpdater su = new StatusUpdater(this);
 				su.start();
 			}
@@ -144,7 +146,8 @@ public class GraphicalMain extends JFrame implements ActionListener{
 
 	public void setText(String text){
 		this.text.setText(text);
-		String msg = this.vstatus.getText() + "\nLogical Processors: " + WordFinder.processorCount() + "\nIOC suggested period " + this.ioc + "\nKey: \"" + this.vtool.getKey() + "\"\n\nThese words supported the plaintext:\n";
+		String iocstring = String.format("%.3f", this.iocvalue);
+		String msg = this.vstatus.getText() + "\nLogical Processors: " + WordFinder.processorCount() + "\nIOC suggested period " + this.ioc + " (" + iocstring + ")\nKey: \"" + this.vtool.getKey() + "\"\n\nThese words supported the plaintext:\n";
 
 		if(!text.equals("!")){ // "!" means vtool couldn't decrypt it
 			String[] foundWords = vtool.getFoundWords();

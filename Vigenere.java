@@ -243,18 +243,8 @@ public class Vigenere extends Thread{
 
 	// calculates index of coincedence and returns suspected key period
 	public static int indexOfCoincedence(String text){
-		int[] lf = new int[26];
-		for(int i = 0; i < 26; ++i)
-			lf[i] = 0;
 
-		for(int i = 0; i < text.length(); ++i)
-			++lf[text.charAt(i) - 'A'];
-
-		double sum = 0.0;
-		for(int i = 0; i < 26; ++i)
-			sum = sum + (lf[i] * (lf[i] - 1.0));
-
-		sum = sum * (1.0 / (text.length() * (text.length() - 1.0)));
+		double sum = Vigenere.ioc(text);
 
 		double[] ioctable = {
 			0.0,	// 0
@@ -281,6 +271,23 @@ public class Vigenere extends Thread{
 				smallestDifference = i;
 
 		return smallestDifference;
+	}
+
+	public static double ioc(String text){
+		int[] lf = new int[26];
+		for(int i = 0; i < 26; ++i)
+			lf[i] = 0;
+
+		for(int i = 0; i < text.length(); ++i)
+			++lf[text.charAt(i) - 'A'];
+
+		double sum = 0.0;
+		for(int i = 0; i < 26; ++i)
+			sum = sum + (lf[i] * (lf[i] - 1.0));
+
+		sum = sum * (1.0 / (text.length() * (text.length() - 1.0)));
+
+		return sum;
 	}
 
 	public static StringBuilder convertToUpper(String s){
