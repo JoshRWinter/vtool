@@ -74,7 +74,16 @@ public class GraphicalMain extends JFrame implements ActionListener{
 			String ctext = this.text.getText();
 			if(ctext.length() == 0)
 				return;
-				if(this.vtool == null){
+
+			String key = JOptionPane.showInputDialog("Input decryption key (leave blank to guess):");
+			if(key.length() != 0){
+				StringBuilder keysb = Vigenere.convertToUpper(key);
+				StringBuilder sb = Vigenere.convertToUpper(ctext);
+				this.text.setText(Vigenere.vigenere(sb.toString(), keysb.toString()));
+				return;
+			}
+
+			if(this.vtool == null){
 				this.vtool = new Vtool(ctext,1,12);
 				this.ioc = Vigenere.indexOfCoincedence(this.vtool.getCText());
 				StatusUpdater su = new StatusUpdater(this);

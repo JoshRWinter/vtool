@@ -28,14 +28,8 @@ public class Vigenere extends Thread{
 		this.vtool = vtool;
 
 		this.key = new StringBuilder();
-		this.ctext = new StringBuilder(text.length());
+		this.ctext = Vigenere.convertToUpper(text);
 		this.dict = new Dictionary();
-
-		// set cipher text to all caps with no puct or spaces, just letters
-		for(int i = 0; i < text.length(); ++i){
-			if(this.isValidChar(text.charAt(i)))
-				this.ctext.append(Character.toUpperCase(text.charAt(i)));
-		}
 	}
 
 	public String getKey(){
@@ -158,7 +152,7 @@ public class Vigenere extends Thread{
 	}
 
 	// decrypt <ctext> with <key>
-	private static String vigenere(String ctext,String key){
+	public static String vigenere(String ctext,String key){
 		StringBuilder ptext = new StringBuilder();
 		for(int i = 0; i < ctext.length(); ++i){
 			char c = (char)(ctext.charAt(i) - 'A');
@@ -287,6 +281,16 @@ public class Vigenere extends Thread{
 				smallestDifference = i;
 
 		return smallestDifference;
+	}
+
+	public static StringBuilder convertToUpper(String s){
+		StringBuilder sb = new StringBuilder(s.length());
+		// set cipher text to all caps with no puct or spaces, just letters
+		for(int i = 0; i < s.length(); ++i){
+			if(Vigenere.isValidChar(s.charAt(i)))
+				sb.append(Character.toUpperCase(s.charAt(i)));
+		}
+		return sb;
 	}
 
 	private static boolean isValidChar(char c){
