@@ -79,7 +79,7 @@ public class GraphicalMain extends JFrame implements ActionListener{
 			if(this.vtool == null){
 				// user provided key
 				String key = JOptionPane.showInputDialog("Input decryption key (leave blank to guess):");
-				if(key.length() != 0){
+				if(key != null && key.length() != 0){
 					StringBuilder keysb = Vigenere.convertToUpper(key);
 					StringBuilder sb = Vigenere.convertToUpper(ctext);
 					this.text.setText(Vigenere.vigenere(sb.toString(), keysb.toString()));
