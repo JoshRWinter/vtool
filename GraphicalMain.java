@@ -148,7 +148,7 @@ public class GraphicalMain extends JFrame implements ActionListener{
 
 	public void setText(String text){
 		this.text.setText(text);
-		String iocstring = String.format("%.3f", this.iocvalue);
+		String iocstring = String.format("%.6f", this.iocvalue);
 		String msg = this.vstatus.getText() + "\nLogical Processors: " + WordFinder.processorCount() + "\nIOC suggested period " + this.ioc + " (" + iocstring + ")\nKey: \"" + this.vtool.getKey() + "\"\n\nThese words supported the plaintext:\n";
 
 		if(!text.equals("!")){ // "!" means vtool couldn't decrypt it
