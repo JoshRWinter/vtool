@@ -85,6 +85,8 @@ public class GraphicalMain extends JFrame implements ActionListener{
 					this.text.setText(Vigenere.vigenere(sb.toString(), keysb.toString()));
 					return;
 				}
+				if(key == null)
+					return;
 
 				// user provided no key
 				this.vtool = new Vtool(ctext,1,12);
